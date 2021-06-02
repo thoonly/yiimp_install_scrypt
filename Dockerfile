@@ -17,4 +17,9 @@ COPY . .
 
 VOLUME /run /tmp
 
+# API
+EXPOSE 80
+# Stratum Ports
+EXPOSE 3032-8533
+
 SHELL ["/bin/bash", "-c"]
