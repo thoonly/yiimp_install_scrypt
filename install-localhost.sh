@@ -958,14 +958,14 @@
     echo
     echo -e "Performing the SQL import"
     echo
-    sleep 3
+    sleep 5
 
     cd ~
     cd yiimp/sql
 
     # Import sql dump
     sudo zcat 2020-11-10-yaamp.sql.gz | sudo mysql --defaults-group-suffix=host1
-
+    sleep 10
     # Oh the humanity!
     sudo mysql --defaults-group-suffix=host1 --force < 2016-04-24-market_history.sql
     sudo mysql --defaults-group-suffix=host1 --force < 2016-04-27-settings.sql
