@@ -17,4 +17,6 @@ COPY . .
 
 VOLUME /run /tmp
 
+EXPOSE 80 3306 3333 3433
+
 SHELL ["/bin/bash", "-c"]
