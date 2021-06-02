@@ -24,6 +24,11 @@
     exit 1;
     }
 
+    if [ -f /etc/screen-scrypt.sh ]; then
+        echo "Yiimp installed!"
+        exit 0
+    fi
+
     #Add user group sudo + no password
     whoami=`whoami`
     sudo usermod -aG sudo ${whoami}
@@ -62,7 +67,7 @@
     hide_output sudo apt -y update
     hide_output sudo apt -y upgrade
     hide_output sudo apt -y autoremove
-    apt_install dialog python3 python3-pip acl nano apt-transport-https
+    sudo apt -y install dialog python3 python3-pip acl nano apt-transport-https build-essential pkg-config make git g++ gcc
     echo -e "$GREEN Done...$COL_RESET"
 
 
@@ -153,6 +158,7 @@
     hide_output sudo systemctl enable mysql
     sleep 5
     sudo systemctl status mysql | sed -n "1,3p"
+    sleep 15
     echo
     echo -e "$GREEN Done...$COL_RESET"
 
@@ -171,13 +177,13 @@
     hide_output sudo apt -y update
 
     if [[ ("$DISTRO" == "16") ]]; then
-    apt_install php7.3-fpm php7.3-opcache php7.3 php7.3-common php7.3-gd php7.3-mysql php7.3-imap php7.3-cli \
+    sudo apt -y install php7.3-fpm php7.3-opcache php7.3 php7.3-common php7.3-gd php7.3-mysql php7.3-imap php7.3-cli \
     php7.3-cgi php-pear php-auth imagemagick libruby php7.3-curl php7.3-intl php7.3-pspell mcrypt\
     php7.3-recode php7.3-sqlite3 php7.3-tidy php7.3-xmlrpc php7.3-xsl php7.3-memcached php7.3-memcache php-imagick php-gettext php7.3-zip php7.3-mbstring
     #hide_output sudo phpenmod mcrypt
     #hide_output sudo phpenmod mbstring
     else
-    apt_install php7.3-fpm php7.3-opcache php7.3 php7.3-common php7.3-gd php7.3-mysql php7.3-imap php7.3-cli \
+    sudo apt -y install php7.3-fpm php7.3-opcache php7.3 php7.3-common php7.3-gd php7.3-mysql php7.3-imap php7.3-cli \
     php7.3-cgi php-pear imagemagick libruby php7.3-curl php7.3-intl php7.3-pspell mcrypt\
     php7.3-recode php7.3-sqlite3 php7.3-tidy php7.3-xmlrpc php7.3-xsl php7.3-memcached php7.3-memcache php-imagick php-gettext php7.3-zip php7.3-mbstring \
     libpsl-dev libnghttp2-dev
@@ -185,6 +191,7 @@
     sleep 5
     hide_output sudo systemctl start php7.3-fpm
     sudo systemctl status php7.3-fpm | sed -n "1,3p"
+    sleep 15
     echo
     echo -e "$GREEN Done...$COL_RESET"
 
@@ -273,6 +280,7 @@
     hide_output sudo ufw allow ssh
     hide_output sudo ufw allow http
     hide_output sudo ufw allow https
+    hide_output sudo ufw allow 3306/tcp
     hide_output sudo ufw allow 3333/tcp
     hide_output sudo ufw allow 3339/tcp
     hide_output sudo ufw allow 3334/tcp
@@ -369,7 +377,7 @@
 
     # Compil Blocknotify
     cd ~
-    hide_output git clone https://github.com/Kudaraidee/yiimp
+    hide_output git clone https://github.com/thoonly/yiimp.git
     cd $HOME/yiimp/blocknotify
     sudo sed -i 's/tu8tu5/'$blckntifypass'/' blocknotify.cpp
     hide_output sudo make
@@ -387,7 +395,7 @@
 
     # Copy Files (Blocknotify,iniparser,Stratum)
     cd $HOME/yiimp
-    sudo sed -i 's/myadmin/'AdminPanel'/' $HOME/yiimp/web/yaamp/modules/site/SiteController.php
+    sudo sed -i 's/AdminRights/'AdminPanel'/' $HOME/yiimp/web/yaamp/modules/site/SiteController.php
     sudo cp -r $HOME/yiimp/web /var/
     sudo mkdir -p /var/stratum
     cd $HOME/yiimp/stratum
@@ -527,8 +535,8 @@
 
     sudo ln -s /etc/nginx/sites-available/$server_name.conf /etc/nginx/sites-enabled/$server_name.conf
     sudo ln -s /var/web /var/www/$server_name/html
-    hide_output sudo systemctl reload php7.3-fpm.service
-    hide_output sudo systemctl restart nginx.service
+    sudo systemctl reload php7.3-fpm.service
+    sudo systemctl restart nginx.service
     echo -e "$GREEN Done...$COL_RESET"
 
     if [[ ("$ssl_install" == "y" || "$ssl_install" == "Y" || "$ssl_install" == "") ]]; then
@@ -879,8 +887,12 @@
     # Create database
     Q1="CREATE DATABASE IF NOT EXISTS yiimpfrontend;"
     Q2="GRANT ALL ON *.* TO 'panel'@'localhost' IDENTIFIED BY '$password';"
-    Q3="FLUSH PRIVILEGES;"
-    SQL="${Q1}${Q2}${Q3}"
+
+    # unsafe root user
+    Q3="CREATE USER root IDENTIFIED BY 'root';"
+    Q4="GRANT ALL ON *.* TO 'root' IDENTIFIED BY 'root';"
+    Q5="FLUSH PRIVILEGES;"
+    SQL="${Q1}${Q2}${Q3}${Q4}${Q5}"
     sudo mysql -u root -p="" -e "$SQL"
 
     # Create stratum user
@@ -888,6 +900,12 @@
     Q2="FLUSH PRIVILEGES;"
     SQL="${Q1}${Q2}"
     sudo mysql -u root -p="" -e "$SQL"
+
+    # Sets mariadb conf bind to 0.0.0.0 to enable remote access
+    sed -i '29s/.*/bind-address            = 0.0.0.0/' /etc/mysql/mariadb.conf.d/50-server.cnf
+
+    # start stratum server on startup
+    sed -i '11i\ screen -dmS sha $STRATUM_DIR/run.sh sha' /etc/screen-scrypt.sh
 
     #Create my.cnf
 
@@ -972,7 +990,13 @@
     sudo mysql --defaults-group-suffix=host1 --force < 2017-11-segwit.sql
     sudo mysql --defaults-group-suffix=host1 --force < 2018-01-stratums_ports.sql
     sudo mysql --defaults-group-suffix=host1 --force < 2018-02-coins_getinfo.sql
-    sudo mysql --defaults-group-suffix=host1 --force < 2018-09-22-workers.sql
+
+#    # enable btc mining
+   Q1="UPDATE yiimpfrontend.coins SET visible = 1, rpcport = 11112, rpchost = 'bitcoind', rpcuser = 'root', rpcpasswd = 'root', enable = 1, auto_ready = 1, available = 1, usesegwit = 1, hasgetinfo = 0 WHERE id = 6;"
+   Q2="UPDATE yiimpfrontend.coins SET visible = 1, rpcport = 21112, rpchost = 'namecoind', rpcuser = 'root', rpcpasswd = 'root', enable = 1, auto_ready = 1, available = 1, usesegwit = 1, hasgetinfo = 0 WHERE id = 577;"
+   SQL="${Q1}${Q2}"
+   sudo mysql -u root -p="" -e "$SQL"
+
     echo -e "$GREEN Done...$COL_RESET"
 
 
@@ -1142,12 +1166,22 @@
 
     #fix error screen main "backup sql frontend"
     sudo sed -i "s|/root/backup|/var/yiimp/sauv|g" /var/web/yaamp/core/backend/system.php
-    #no need for Kudaraidee yiimp repo
-    #sudo sed -i '14d' /var/web/yaamp/defaultconfig.php
+    sudo sed -i '14d' /var/web/yaamp/defaultconfig.php
 
     #Misc
     sudo mv $HOME/yiimp/ $HOME/yiimp-install-only-do-not-run-commands-from-this-folder
     sudo rm -rf /var/log/nginx/*
+
+    # rc.local on startup
+    # ln -s $HOME/yiimp-install-only-do-not-run-commands-from-this-folder/rc.local /etc/rc.local
+    # sed -i '1s/.*/#!\/bin\/bash -e/' /etc/rc.local
+    # chmod +x /etc/rc.local
+
+    # log dir
+    mkdir -p /work/yiimp/log
+
+    # fix permissions
+    chmod 777 /var/web/*.sh
 
     #Hold update OpenSSL
     #If you want remove the hold : sudo apt-mark unhold openssl
