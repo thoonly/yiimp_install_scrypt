@@ -970,7 +970,7 @@
     cd yiimp/sql
 
     # Import sql dump
-    sudo zcat 2016-04-03-yaamp.sql.gz | sudo mysql --defaults-group-suffix=host1
+    sudo zcat 2020-11-10-yaamp.sql.gz | sudo mysql --defaults-group-suffix=host1
 
     # Oh the humanity!
     sudo mysql --defaults-group-suffix=host1 --force < 2016-04-24-market_history.sql
@@ -990,6 +990,9 @@
     sudo mysql --defaults-group-suffix=host1 --force < 2017-11-segwit.sql
     sudo mysql --defaults-group-suffix=host1 --force < 2018-01-stratums_ports.sql
     sudo mysql --defaults-group-suffix=host1 --force < 2018-02-coins_getinfo.sql
+    sudo mysql --defaults-group-suffix=host1 --force < 2018-09-22-workers.sql
+    sudo mysql --defaults-group-suffix=host1 --force < 2019-03-coins_thepool_life.sql
+    sudo mysql --defaults-group-suffix=host1 --force < 2020-06-03-blocks.sql
 
 #    # enable btc mining
    Q1="UPDATE yiimpfrontend.coins SET visible = 1, rpcport = 11112, rpchost = 'bitcoind', rpcuser = 'root', rpcpasswd = 'root', enable = 1, auto_ready = 1, available = 1, usesegwit = 1, hasgetinfo = 0 WHERE id = 6;"
