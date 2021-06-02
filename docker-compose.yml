@@ -1,5 +1,7 @@
 version: "3.7"
 services:
+  playcoind:
+    container_name: playcoind
   yiimp:
     image: thoonly/yiimp
     container_name: yiimp

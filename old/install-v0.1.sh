@@ -3,10 +3,10 @@
 # Original Author:   crombiecrunch
 # Fork Author: manfromafar
 # Current Author: Xavatar (https://github.com/xavatar/yiimp_install_scrypt)
-# Web: https://www.xavatar.com  
+# Web:     
 #
 # Program:
-#   Install yiimp on Ubuntu 16.04 running Nginx, MariaDB, and php7.0
+#   Install yiimp on Ubuntu 16.04 running Nginx, MariaDB, and php7.0.x
 # 
 # 
 ################################################################################
@@ -22,14 +22,7 @@ displayErr() {
     echo
     exit 1;
 }
-    clear
-    output " "
-    output "Yiimp Install Script v0.1"
-    output "Install yiimp on Ubuntu 16.04 running Nginx, MariaDB, and php7.0"
-    output " "
-    sleep 3
-    
-    output " "
+
     output " "
     output "Make sure you double check before hitting enter! Only one shot at these!"
     output " "
@@ -145,7 +138,7 @@ default         0;
     sleep 3
     
     sudo aptitude -y install software-properties-common build-essential
-    sudo aptitude -y install libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils git cmake libboost-all-dev zlib1g-dev libz-dev libseccomp-dev libcap-dev libminiupnpc-dev gettext
+    sudo aptitude -y install libtool autotools-dev automake pkg-config libssl-dev libevent-dev bsdmainutils git cmake libboost-all-dev zlib1g-dev libz-dev libseccomp-dev libcap-dev libminiupnpc-dev
     sudo aptitude -y install libminiupnpc10 libzmq5
     sudo aptitude -y install libcanberra-gtk-module libqrencode-dev libzmq3-dev
     sudo aptitude -y install libqt5gui5 libqt5core5a libqt5webkit5-dev libqt5dbus5 qttools5-dev qttools5-dev-tools libprotobuf-dev protobuf-compiler
@@ -320,7 +313,7 @@ default         0;
     sudo mkdir -p /etc/yiimp
     sudo mkdir -p /$HOME/backup/
     #fixing yiimp
-    sudo sed -i "s|ROOTDIR=/data/yiimp|ROOTDIR=/var|g" /bin/yiimp
+    sed -i "s|ROOTDIR=/data/yiimp|ROOTDIR=/var|g" /bin/yiimp
     #fixing run.sh
     sudo rm -r /var/stratum/config/run.sh
     echo '
@@ -890,55 +883,38 @@ define('"'"'EXCH_YOBIT_SECRET'"'"', '"'"''"'"');
     # Make config file
 echo '
 <?php
-
 ini_set('"'"'date.timezone'"'"', '"'"'UTC'"'"');
-
-define('"'"'YAAMP_LOGS'"'"', '"'"'/var/log/yiimp'"'"');
+define('"'"'YAAMP_LOGS'"'"', '"'"'/var/log'"'"');
 define('"'"'YAAMP_HTDOCS'"'"', '"'"'/var/web'"'"');
-
 define('"'"'YAAMP_BIN'"'"', '"'"'/var/bin'"'"');
-
 define('"'"'YAAMP_DBHOST'"'"', '"'"'localhost'"'"');
 define('"'"'YAAMP_DBNAME'"'"', '"'"'yiimpfrontend'"'"');
 define('"'"'YAAMP_DBUSER'"'"', '"'"'panel'"'"');
 define('"'"'YAAMP_DBPASSWORD'"'"', '"'"''"${password}"''"'"');
-
 define('"'"'YAAMP_PRODUCTION'"'"', true);
 define('"'"'YAAMP_RENTAL'"'"', false);
-
 define('"'"'YAAMP_LIMIT_ESTIMATE'"'"', false);
-
 define('"'"'YAAMP_FEES_MINING'"'"', 0.5);
 define('"'"'YAAMP_FEES_EXCHANGE'"'"', 2);
 define('"'"'YAAMP_FEES_RENTING'"'"', 2);
 define('"'"'YAAMP_TXFEE_RENTING_WD'"'"', 0.002);
-
 define('"'"'YAAMP_PAYMENTS_FREQ'"'"', 2*60*60);
 define('"'"'YAAMP_PAYMENTS_MINI'"'"', 0.001);
-
 define('"'"'YAAMP_ALLOW_EXCHANGE'"'"', false);
 define('"'"'YIIMP_PUBLIC_EXPLORER'"'"', true);
-define('"'"'YIIMP_PUBLIC_BENCHMARK'"'"', false);
-
+define('"'"'YIIMP_PUBLIC_BENCHMARK'"'"', true);
 define('"'"'YIIMP_FIAT_ALTERNATIVE'"'"', '"'"'USD'"'"'); // USD is main
 define('"'"'YAAMP_USE_NICEHASH_API'"'"', false);
-
 define('"'"'YAAMP_BTCADDRESS'"'"', '"'"'1C1hnjk3WhuAvUN6Ny6LTxPD3rwSZwapW7'"'"');
-
 define('"'"'YAAMP_SITE_URL'"'"', '"'"''"${server_name}"''"'"');
 define('"'"'YAAMP_STRATUM_URL'"'"', YAAMP_SITE_URL); // change if your stratum server is on a different host
 define('"'"'YAAMP_SITE_NAME'"'"', '"'"'YIIMP'"'"');
 define('"'"'YAAMP_ADMIN_EMAIL'"'"', '"'"''"${EMAIL}"''"'"');
 define('"'"'YAAMP_ADMIN_IP'"'"', '"'"''"${Public}"''"'"'); // samples: "80.236.118.26,90.234.221.11" or "10.0.0.1/8"
-
 define('"'"'YAAMP_ADMIN_WEBCONSOLE'"'"', true);
-define('"'"'YAAMP_CREATE_NEW_COINS'"'"', false);
-define('"'"'YAAMP_NOTIFY_NEW_COINS'"'"', false);
-
+define('"'"'YAAMP_NOTIFY_NEW_COINS'"'"', true);
 define('"'"'YAAMP_DEFAULT_ALGO'"'"', '"'"'x11'"'"');
-
 define('"'"'YAAMP_USE_NGINX'"'"', true);
-
 // Exchange public keys (private keys are in a separate config file)
 define('"'"'EXCH_CRYPTOPIA_KEY'"'"', '"'"''"'"');
 define('"'"'EXCH_POLONIEX_KEY'"'"', '"'"''"'"');
@@ -955,32 +931,26 @@ define('"'"'EXCH_HITBTC_KEY'"'"','"'"''"'"');
 define('"'"'EXCH_KRAKEN_KEY'"'"', '"'"''"'"');
 define('"'"'EXCH_LIVECOIN_KEY'"'"', '"'"''"'"');
 define('"'"'EXCH_NOVA_KEY'"'"', '"'"''"'"');
-
 // Automatic withdraw to Yaamp btc wallet if btc balance > 0.3
 define('"'"'EXCH_AUTO_WITHDRAW'"'"', 0.3);
-
 // nicehash keys deposit account & amount to deposit at a time
 define('"'"'NICEHASH_API_KEY'"'"','"'"'f96c65a7-3d2f-4f3a-815c-cacf00674396'"'"');
 define('"'"'NICEHASH_API_ID'"'"','"'"'825979'"'"');
 define('"'"'NICEHASH_DEPOSIT'"'"','"'"'3ABoqBjeorjzbyHmGMppM62YLssUgJhtuf'"'"');
 define('"'"'NICEHASH_DEPOSIT_AMOUNT'"'"','"'"'0.01'"'"');
-
 $cold_wallet_table = array(
 	'"'"'1PqjApUdjwU9k4v1RDWf6XveARyEXaiGUz'"'"' => 0.10,
 );
-
 // Sample fixed pool fees
 $configFixedPoolFees = array(
         '"'"'zr5'"'"' => 2.0,
         '"'"'scrypt'"'"' => 20.0,
         '"'"'sha256'"'"' => 5.0,
 );
-
 // Sample custom stratum ports
 $configCustomPorts = array(
 //	'"'"'x11'"'"' => 7000,
 );
-
 // mBTC Coefs per algo (default is 1.0)
 $configAlgoNormCoef = array(
 //	'"'"'x11'"'"' => 5.0,
@@ -1009,51 +979,27 @@ $configAlgoNormCoef = array(
     output "Final Directory permissions"
     output " "
     sleep 3
-
-    #whoami=`whoami`
-    #sudo mkdir /root/backup/
+    
+    whoami=`whoami`
+    sudo mkdir /root/backup/
     #sudo usermod -aG www-data $whoami
     #sudo chown -R www-data:www-data /var/log
-    #sudo chown -R www-data:www-data /var/stratum
-    #sudo chown -R www-data:www-data /var/web
-    #sudo touch /var/log/debug.log
-    #sudo chown -R www-data:www-data /var/log/debug.log
-    #sudo chmod -R 775 /var/www/$server_name/html
-    #sudo chmod -R 775 /var/web
-    #sudo chmod -R 775 /var/stratum
-    #sudo chmod -R 775 /var/web/yaamp/runtime
-    #sudo chmod -R 664 /root/backup/
-    #sudo chmod -R 644 /var/log/debug.log
-    #sudo chmod -R 775 /var/web/serverconfig.php
-
-    whoami=`whoami`
-    sudo usermod -aG www-data $whoami
-    sudo usermod -a -G www-data $whoami
-
-    sudo mkdir /root/backup/
-    
-    sudo mkdir /var/log/yiimp
-    sudo touch /var/log/yiimp/debug.log
-    sudo chown -R www-data:www-data /var/log/yiimp
-    sudo chmod -R 775 /var/log/yiimp
-    
     sudo chown -R www-data:www-data /var/stratum
-    sudo chmod -R 775 /var/stratum
-
     sudo chown -R www-data:www-data /var/web
+    sudo touch /var/log/debug.log
+    sudo chown -R www-data:www-data /var/log/debug.log
+    sudo chmod -R 775 /var/www/$server_name/html
     sudo chmod -R 775 /var/web
-    sudo find /var/web -type d -exec chmod 755 {} +
-    sudo find /var/web -type f -exec chmod 664 {} +
-    sudo chgrp www-data /var/web -R
-    sudo chmod g+w /var/web -R
-
-
+    sudo chmod -R 775 /var/stratum
+    sudo chmod -R 775 /var/web/yaamp/runtime
+    sudo chmod -R 664 /root/backup/
+    sudo chmod -R 644 /var/log/debug.log
+    sudo chmod -R 775 /var/web/serverconfig.php
     sudo mv $HOME/yiimp/ $HOME/yiimp-install-only-do-not-run-commands-from-this-folder
     sudo rm -rf /var/log/nginx/*
-
     sudo systemctl reload php7.0-fpm.service
     sudo systemctl restart nginx.service
-
+    
 
     output " "
     output " "
