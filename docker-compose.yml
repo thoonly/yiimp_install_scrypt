@@ -1,5 +1,16 @@
 version: "3.7"
 services:
+  playcoind:
+    container_name: playcoind
+    stdin_open: true
+    image: thoonly/playcoin:latest
+    networks:
+      - yiimp_default
+    ports:
+      - "9345:9345"
+      - "9456:9456"
+    volumes:
+      - /var/app/playcoin:/root/.playcoin
   yiimp:
     image: thoonly/yiimp
     container_name: yiimp
@@ -18,6 +29,7 @@ services:
       - "80:80"
       - "3306:3306"
       - "3333:3333"
+      - "3433:3433"
 networks:
   yiimp_default:
     external: true
