@@ -1,3 +1,40 @@
+# Yiimp + HTR Merged Mining
+
+## Build and run yiimp + bitcoind + hathor-cli
+```bash
+sudo docker-compose up -d && \
+sudo docker-compose exec yiimp bash install-localhost.sh && \
+sudo docker-compose restart yiimp
+```
+
+> Go [localhost](http://localhost) to access the main screen!
+
+> Go [localhost/site/myadmin](http://localhost/site/myadmin) to access the admin panel!
+
+> Mysql access available at localhost:3306 (user: root, password: root)!
+
+## Merged mining HTR! (Not working, just a proposal)
+```bash
+docker run --rm tpruvot/cpuminer-multi  -a sha256d --url=stratum+tcp://localhost:3333 -u address -c=HTR
+```
+
+## Utilities
+
+```bash
+# yiimp checkup
+docker exec -it yiimp yiimp checkup
+```
+
+```bash
+# yiimp debug log
+docker exec -it yiimp tail -f /var/log/yiimp/debug.log
+```
+
+```bash
+# spawn a container bash
+docker exec -it yiimp /bin/bash
+```
+
 # Yiimp_install_scrypt v0.2 (update Avril, 2020)
 
 Site : https://www.xavatar.com

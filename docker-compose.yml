@@ -1,0 +1,23 @@
+version: "3.7"
+services:
+  yiimp:
+    image: thoonly/yiimp
+    container_name: yiimp
+    stdin_open: true
+    build:
+      context: .
+    tmpfs:
+      - /tmp
+      - /run
+      - /run/lock
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    networks:
+      - yiimp_default
+    ports:
+      - "80:80"
+      - "3306:3306"
+      - "3333:3333"
+networks:
+  yiimp_default:
+    external: true
