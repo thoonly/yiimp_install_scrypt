@@ -369,7 +369,7 @@
     
     # Compil Blocknotify
     cd ~
-    hide_output git clone https://github.com/thoonly/yiimp
+    hide_output git clone https://github.com/thoonly/yiimp.git
     cd $HOME/yiimp/blocknotify
     sudo sed -i 's/tu8tu5/'$blckntifypass'/' blocknotify.cpp
     hide_output sudo make
